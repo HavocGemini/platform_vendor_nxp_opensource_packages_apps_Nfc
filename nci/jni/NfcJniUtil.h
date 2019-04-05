@@ -42,6 +42,7 @@
 #include <semaphore.h>
 #include "Nxp_Features.h"
 
+#undef ALOGV
 #define ALOGV ALOGD
 /* Discovery modes -- keep in sync with NFCManager.DISCOVERY_MODE_* */
 #define DISCOVERY_MODE_TAG_READER         0
@@ -125,7 +126,7 @@
 /*NFCEE recovery maximum timeout value*/
 #define MAX_EE_RECOVERY_TIMEOUT    10000
 /* NFC states: Primarily used to decide SPI signal handling (whether to discard or accept)*/
-typedef enum eNfcState
+enum eNfcState
 {
     NFC_OFF = 0x00, /* Default state */
     NFC_INITIALIZING_IN_PROGRESS = 0x01, /* Initializing not complete (RF discovery not enabled yet) */

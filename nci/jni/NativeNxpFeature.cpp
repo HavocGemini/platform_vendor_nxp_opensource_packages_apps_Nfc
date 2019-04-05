@@ -691,7 +691,7 @@ tNFA_STATUS GetNumNFCEEConfigured(void)
         ALOGE("%s: Failed NFA_SendNxpNciCommand", __func__);
     }
     status = GetCbStatus();
-    ALOGV("%s : gActualSeCount = %ld",__func__, gActualSeCount);
+    ALOGV("%s : gActualSeCount = %d",__func__, gActualSeCount);
     return status;
 }
 

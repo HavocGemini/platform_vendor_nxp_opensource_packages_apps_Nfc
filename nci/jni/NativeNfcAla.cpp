@@ -431,7 +431,7 @@ jbyteArray nfcManager_lsGetVersion(JNIEnv* e, jobject)
 
         pTransactionController->transactionEnd(TRANSACTION_REQUESTOR(lsGetVersion));
 
-        ALOGV("%s: exit: recv len=%ld", __func__, recvBufferMaxSize);
+        ALOGV("%s: exit: recv len=%d", __func__, recvBufferMaxSize);
     }
     else
     {
@@ -495,7 +495,7 @@ jbyteArray nfcManager_lsGetAppletStatus(JNIEnv* e, jobject)
         if(dwpChannelForceClose == false)
             startRfDiscovery (true);
 
-        ALOGV("%s: exit: recv len=%ld", __func__, recvBufferMaxSize);
+        ALOGV("%s: exit: recv len=%d", __func__, recvBufferMaxSize);
     }
     else {
         result = e->NewByteArray(0);
@@ -535,7 +535,7 @@ jbyteArray nfcManager_lsGetStatus(JNIEnv* e, jobject)
         {
             e->SetByteArrayRegion(result, 0, recvBufferMaxSize, (jbyte *) recvBuffer);
         }
-        ALOGV("%s: exit: recv len=%ld", __func__, recvBufferMaxSize);
+        ALOGV("%s: exit: recv len=%d", __func__, recvBufferMaxSize);
     }
     else {
         result = e->NewByteArray(0);

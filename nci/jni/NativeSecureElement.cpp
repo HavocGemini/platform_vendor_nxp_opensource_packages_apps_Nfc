@@ -28,6 +28,7 @@
 #include <nativehelper/ScopedPrimitiveArray.h>
 #include "phNxpConfig.h"
 
+#undef ALOGV
 #define ALOGV ALOGD
 extern bool hold_the_transceive;
 extern int dual_mode_current_state;
@@ -214,7 +215,7 @@ static jint nativeNfcSecureElement_doOpenSecureElementConnection (JNIEnv*, jobje
     }
 
 
-    if (((nfcFL.eseFL._NXP_ESE_VER == JCOP_VER_3_1)) &&(!(p61_current_state & P61_STATE_SPI) && !(p61_current_state & P61_STATE_SPI_PRIO))||(nfcFL.eseFL._NXP_ESE_VER != JCOP_VER_3_1))
+    if ((((nfcFL.eseFL._NXP_ESE_VER == JCOP_VER_3_1)) &&(!(p61_current_state & P61_STATE_SPI) && !(p61_current_state & P61_STATE_SPI_PRIO)))||(nfcFL.eseFL._NXP_ESE_VER != JCOP_VER_3_1))
     {
         if(p61_current_state & (P61_STATE_SPI)||(p61_current_state & (P61_STATE_SPI_PRIO)))
         {
@@ -643,7 +644,7 @@ static jbyteArray nativeNfcSecureElement_doGetAtr (JNIEnv* e, jobject, jint hand
         e->SetByteArrayRegion(result, 0, recvBufferActualSize, (jbyte *) recvBuffer);
     }
 
-    ALOGV("%s: exit: recv len=%ld", __func__, recvBufferActualSize);
+    ALOGV("%s: exit: recv len=%d", __func__, recvBufferActualSize);
 
     return result;
 }
@@ -692,7 +693,7 @@ static jbyteArray nativeNfcSecureElement_doTransceive (JNIEnv* e, jobject, jint 
         ALOGV("APDU Transceive CE wait");
         SecureElement::getInstance().startThread(0x01);
     }
-    ALOGV("%s: exit: recv len=%ld", __func__, recvBufferActualSize);
+    ALOGV("%s: exit: recv len=%d", __func__, recvBufferActualSize);
     return result;
 #else
     jbyteArray result = e->NewByteArray(0);

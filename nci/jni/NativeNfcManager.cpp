@@ -66,6 +66,7 @@ extern "C"
     #include "IChannel.h"
 #endif
 }
+#undef ALOGV
 #define ALOGV ALOGD
 #define SAK_VALUE_AT 17
 extern bool                   gReaderNotificationflag;
@@ -319,7 +320,7 @@ static jbyteArray nfcManager_getFwFileName(JNIEnv* e, jobject o);
 static int nfcManager_getNfcInitTimeout(JNIEnv* e, jobject o);
 static int nfcManager_doJcosDownload(JNIEnv* e, jobject o);
 static void nfcManager_doCommitRouting(JNIEnv* e, jobject o);
-static void nfcManager_doSetVenConfigValue (JNIEnv *e, jobject o, jint venconfig);
+static void nfcManager_doSetVenConfigValue (JNIEnv *e, jobject o, jint venconfig) __attribute__((unused));
 static jint nfcManager_getSecureElementTechList(JNIEnv* e, jobject o);
 static void nfcManager_setSecureElementListenTechMask(JNIEnv *e, jobject o, jint tech_mask);
 static void notifyPollingEventwhileNfcOff();
@@ -411,7 +412,7 @@ static void nfcManager_doPrbsOn(JNIEnv* e, jobject o, jint prbs, jint hw_prbs, j
 static void nfcManager_Enablep2p(JNIEnv* e, jobject o, jboolean p2pFlag);
 //self test end
 static void nfcManager_setProvisionMode(JNIEnv* e, jobject o, jboolean provisionMode);
-static bool nfcManager_doPartialInitialize ();
+static bool nfcManager_doPartialInitialize() __attribute__((unused));
 static bool nfcManager_doPartialDeInitialize();
 static int nfcManager_doSelectUicc(JNIEnv* e, jobject o, jint uiccSlot);
 static int nfcManager_doGetSelectedUicc(JNIEnv* e, jobject o);
@@ -2254,7 +2255,7 @@ static jboolean nfcManager_doInitialize (JNIEnv* e, jobject o)
                 if(nfcFL.eseFL._JCOP_WA_ENABLE) {
                     RoutingManager::getInstance().handleSERemovedNtf();
                 }
-                ALOGV("Discovered se count %ld",gSeDiscoverycount);
+                ALOGV("Discovered se count %d",gSeDiscoverycount);
                 /*Check for ETSI12 Configuration for SEs detected in the HCI Network*/
                 performNfceeETSI12Config();
                 if(nfcFL.eseFL._ESE_ETSI12_PROP_INIT && (swp_getconfig_status & SWP2_ESE)) {
@@ -4469,7 +4470,7 @@ static int nfcManager_getNfcInitTimeout(JNIEnv* e, jobject o)
     gNfcInitTimeout = (disc_timeout + session_id_timeout) *1000;
     gdisc_timeout = disc_timeout *1000;
 
-    ALOGV(" gNfcInitTimeout = %ld: gdisc_timeout = %ld nfcManager_getNfcInitTimeout",
+    ALOGV(" gNfcInitTimeout = %d: gdisc_timeout = %d nfcManager_getNfcInitTimeout",
             gNfcInitTimeout, gdisc_timeout);
     return gNfcInitTimeout;
 }
@@ -4816,7 +4817,7 @@ static int nfcManager_doSelectUicc(JNIEnv* e, jobject o, jint uiccSlot)
             sIsSecElemDetected = sIsSecElemSelected;
         }
 
-        ALOGV("%s : gSeDiscoverycount = %ld", __func__ , gSeDiscoverycount);
+        ALOGV("%s : gSeDiscoverycount = %d", __func__ , gSeDiscoverycount);
         {
             SyncEventGuard g(gNfceeDiscCbEvent);
             /*Get the SWP1 and SWP2 lines status*/
@@ -4825,7 +4826,7 @@ static int nfcManager_doSelectUicc(JNIEnv* e, jobject o, jint uiccSlot)
                 /*The SWP lines enabled and SE's discovered*/
                 if (gSeDiscoverycount < gActualSeCount)
                 {
-                    ALOGV("%s : Wait for ESE to discover, gdisc_timeout = %ld", __func__, gdisc_timeout);
+                    ALOGV("%s : Wait for ESE to discover, gdisc_timeout = %d", __func__, gdisc_timeout);
                     if(gNfceeDiscCbEvent.wait(gdisc_timeout) == false)
                     {
                         ALOGE("%s: timeout waiting for nfcee dis event", __func__);
@@ -5959,7 +5960,7 @@ static void nfcManager_doSetScreenState (JNIEnv* /* e */, jobject /* o */, jint 
             ALOGV("Send Core reset");
             NxpNfc_Send_CoreResetInit_Cmd();
         }
-        ALOGV("%s: auto_num : %d  sAutonomousSet : %d  sRfFieldOff : %d", __func__,auto_num,sAutonomousSet,sRfFieldOff);
+        ALOGV("%s: auto_num : %lu  sAutonomousSet : %d  sRfFieldOff : %d", __func__,auto_num,sAutonomousSet,sRfFieldOff);
         if((auto_num == 0x01) && (sAutonomousSet != 1) &&
                 (sRfFieldOff == true) && (state == NFA_SCREEN_STATE_OFF_LOCKED || state == NFA_SCREEN_STATE_OFF_UNLOCKED))
         {
@@ -7451,7 +7452,7 @@ void write_uicc_context(uint8_t *uiccContext, uint16_t uiccContextLen, uint8_t *
         actualWrittenCrc  = write (fileStream, frameByte, sizeof(crcVal));
         actualWrittenTechCap = write (fileStream, uiccTechCap, techCap);
 
-        ALOGV("%s: %zu bytes written", __func__, cntx_len);
+        ALOGV("%s: %hhu bytes written", __func__, cntx_len);
         if ((actualWrittenCntx == cntx_len) && (actualWrittenTechCap == techCap))
         {
             ALOGV("Write Success!");

@@ -48,6 +48,7 @@ extern "C"{
 #include "nfa_api.h"
 }
 #endif
+#undef ALOGV
 #define ALOGV ALOGD
 /*****************************************************************************
 **
@@ -237,16 +238,16 @@ SecureElement::SecureElement ()
 #if(NXP_EXTNS == TRUE)
     mIsWiredModeOpen(false),
     mIsAllowWiredInDesfireMifareCE(false),
-    mRfFieldEventTimeout(0),
-    mIsIntfRstEnabled (false),
     mETSI12InitStatus (NFA_STATUS_FAILED),
-    mModeSetInfo(NFA_STATUS_FAILED),
+    mRfFieldEventTimeout(0),
     meseETSI12Recovery(false),
+    mIsIntfRstEnabled (false),
     meSESessionIdOk (false),
+    mModeSetInfo(NFA_STATUS_FAILED),
+    mPassiveListenTimeout(0),
+    mPassiveListenCnt(0),
     mPwrCmdstatus(NFA_STATUS_FAILED),
     mNfccPowerMode(0),
-    mPassiveListenCnt(0),
-    mPassiveListenTimeout(0),
 #endif
     mDestinationGate (4), //loopback gate
     mNfaHciHandle (NFA_HANDLE_INVALID),
@@ -267,9 +268,9 @@ SecureElement::SecureElement ()
     mActivatedInListenMode (false),
     mOberthurWarmResetCommand (3),
     mGetAtrRspwait (false),
+    mWmMaxWtxCount(0),
     mRfFieldIsOn(false),
-    mTransceiveWaitOk(false),
-    mWmMaxWtxCount(0)
+    mTransceiveWaitOk(false)
 {
     memset (&mEeInfo, 0, nfcFL.nfccFL._NFA_EE_MAX_EE_SUPPORTED *sizeof(tNFA_EE_INFO));
     memset (&mUiccInfo, 0, sizeof(mUiccInfo));
@@ -363,15 +364,15 @@ bool SecureElement::initialize (nfc_jni_native_data* native)
             if (GetNxpNumValue(NAME_NXP_NFCC_PASSIVE_LISTEN_TIMEOUT, &mPassiveListenTimeout, sizeof(mPassiveListenTimeout)) == false)
             {
                 mPassiveListenTimeout = 2500;
-                ALOGV("%s: NFCC Passive Listen Disable timeout =%ld", fn, mPassiveListenTimeout);
+                ALOGV("%s: NFCC Passive Listen Disable timeout =%u", fn, mPassiveListenTimeout);
             }
-            ALOGV("%s: NFCC Passive Listen Disable timeout =%ld", fn, mPassiveListenTimeout);
+            ALOGV("%s: NFCC Passive Listen Disable timeout =%u", fn, mPassiveListenTimeout);
         }
         if (GetNxpNumValue(NAME_NXP_NFCC_STANDBY_TIMEOUT, &nfccStandbytimeout, sizeof(nfccStandbytimeout)) == false)
         {
             nfccStandbytimeout = 20000;
         }
-        ALOGV("%s: NFCC standby mode timeout =0x%lx", fn, nfccStandbytimeout);
+        ALOGV("%s: NFCC standby mode timeout =0x%x", fn, nfccStandbytimeout);
         if(nfccStandbytimeout > 0 && nfccStandbytimeout < 5000 )
         {
             nfccStandbytimeout = 5000;
@@ -387,7 +388,7 @@ bool SecureElement::initialize (nfc_jni_native_data* native)
         }
         if (GetNxpNumValue(NAME_NXP_WM_MAX_WTX_COUNT, &mWmMaxWtxCount, sizeof(mWmMaxWtxCount)) == false || (mWmMaxWtxCount == 0))
             mWmMaxWtxCount = 9000;
-        ALOGD ("%s: NFCC Wired Mode Max WTX Count =%ld", fn, mWmMaxWtxCount);
+        ALOGD ("%s: NFCC Wired Mode Max WTX Count =%hu", fn, mWmMaxWtxCount);
         dual_mode_current_state = SPI_DWPCL_NOT_ACTIVE;
         hold_the_transceive = false;
         active_ese_reset_control = 0;
@@ -398,7 +399,7 @@ bool SecureElement::initialize (nfc_jni_native_data* native)
         if (GetNxpNumValue(NAME_NXP_NFCC_RF_FIELD_EVENT_TIMEOUT, &mRfFieldEventTimeout, sizeof(mRfFieldEventTimeout)) == false)
         {
             mRfFieldEventTimeout = 2000;
-            ALOGV("%s: RF Field Off event timeout =%ld", fn, mRfFieldEventTimeout);
+            ALOGV("%s: RF Field Off event timeout =%u", fn, mRfFieldEventTimeout);
         }
 
         if (GetNxpNumValue(NAME_NXP_ALLOW_WIRED_IN_MIFARE_DESFIRE_CLT, &retValue, sizeof(retValue)) == false)
@@ -1187,7 +1188,7 @@ TheEnd:
 void SecureElement::notifyTransactionListenersOfAid (const uint8_t* aidBuffer, uint8_t aidBufferLen, const uint8_t* dataBuffer, uint32_t dataBufferLen,uint32_t evtSrc)
 {
     static const char fn [] = "SecureElement::notifyTransactionListenersOfAid";
-    ALOGV("%s: enter; aid len=%u data len=%ld", fn, aidBufferLen, dataBufferLen);
+    ALOGV("%s: enter; aid len=%u data len=%u", fn, aidBufferLen, dataBufferLen);
 
     if (aidBufferLen == 0) {
         return;
@@ -1705,7 +1706,7 @@ bool SecureElement::transceive (uint8_t* xmitBuffer, int32_t xmitBufferSize, uin
     bool isEseAccessSuccess = false;
 #endif
 
-    ALOGV("%s: enter; xmitBufferSize=%ld; recvBufferMaxSize=%ld; timeout=%ld", fn, xmitBufferSize, recvBufferMaxSize, timeoutMillisec);
+    ALOGV("%s: enter; xmitBufferSize=%d; recvBufferMaxSize=%d; timeout=%d", fn, xmitBufferSize, recvBufferMaxSize, timeoutMillisec);
 
     // Check if we need to replace an "empty" SELECT command.
     // 1. Has there been a AID configured, and
@@ -1762,7 +1763,7 @@ bool SecureElement::transceive (uint8_t* xmitBuffer, int32_t xmitBufferSize, uin
             while(hold_the_transceive == true)
             {
                 android::start_timer_msec(&start_timer);
-                ALOGV("%s: holding the transceive for %ld ms.\n", fn, (timeoutMillisec - time_elapsed));
+                ALOGV("%s: holding the transceive for %d ms.\n", fn, (timeoutMillisec - time_elapsed));
                 SyncEventGuard guard(sSPIPrioSessionEndEvent);
                 if(sSPIPrioSessionEndEvent.wait(timeoutMillisec - time_elapsed)== false)
                 {
@@ -1804,7 +1805,7 @@ bool SecureElement::transceive (uint8_t* xmitBuffer, int32_t xmitBufferSize, uin
         }
 
         if(((nfcFL.eseFL._NXP_ESE_VER == JCOP_VER_3_2) || (nfcFL.eseFL._NXP_ESE_VER == JCOP_VER_3_3)) &&nfcFL.eseFL._TRIPLE_MODE_PROTECTION){
-            if((dual_mode_current_state == SPI_DWPCL_BOTH_ACTIVE))
+            if(dual_mode_current_state == SPI_DWPCL_BOTH_ACTIVE)
             {
                 ALOGV("%s, Dont allow wired mode...Dual Mode..", fn);
                 SyncEventGuard guard (mDualModeEvent);
@@ -1931,10 +1932,10 @@ bool SecureElement::transceive (uint8_t* xmitBuffer, int32_t xmitBufferSize, uin
 #endif
 
 #if(NXP_EXTNS == TRUE)
-    ALOGV ("%s: exit; tranStatus: %d; recvBufferActualSize: %ld", fn, tranStatus, recvBufferActualSize);
+    ALOGV ("%s: exit; tranStatus: %d; recvBufferActualSize: %d", fn, tranStatus, recvBufferActualSize);
     return (tranStatus);
 #else
-     ALOGV ("%s: exit; isSuccess: %d; recvBufferActualSize: %ld", fn, isSuccess, recvBufferActualSize);
+     ALOGV ("%s: exit; isSuccess: %d; recvBufferActualSize: %d", fn, isSuccess, recvBufferActualSize);
      return (isSuccess);
 #endif
 }

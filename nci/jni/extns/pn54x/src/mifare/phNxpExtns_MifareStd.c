@@ -1273,7 +1273,7 @@ phNciNfc_RecvMfResp(phNciNfc_Buff_t* RspBuffInfo,
                             writeResponse = PH_NCINFC_STATUS_OK;
                         }
                       }
-                    if( (writeResponse == PH_NCINFC_STATUS_OK))
+                    if(writeResponse == PH_NCINFC_STATUS_OK)
                     {
                         status = NFCSTATUS_SUCCESS;
 
