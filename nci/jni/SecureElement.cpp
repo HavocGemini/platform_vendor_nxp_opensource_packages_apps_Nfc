@@ -236,18 +236,19 @@ const uint16_t ACTIVE_SE_USE_ANY = 0xFFFF;
 SecureElement::SecureElement ()
 :   mActiveEeHandle (NFA_HANDLE_INVALID),
 #if(NXP_EXTNS == TRUE)
-    mIsWiredModeOpen(false),
-    mIsAllowWiredInDesfireMifareCE(false),
     mETSI12InitStatus (NFA_STATUS_FAILED),
-    mRfFieldEventTimeout(0),
+    mWmMaxWtxCount(0),
     meseETSI12Recovery(false),
-    mIsIntfRstEnabled (false),
-    meSESessionIdOk (false),
-    mModeSetInfo(NFA_STATUS_FAILED),
     mPassiveListenTimeout(0),
     mPassiveListenCnt(0),
+    meSESessionIdOk (false),
+    mIsWiredModeOpen(false),
+    mIsAllowWiredInDesfireMifareCE(false),
+    mRfFieldEventTimeout(0),
+    mModeSetInfo(NFA_STATUS_FAILED),
     mPwrCmdstatus(NFA_STATUS_FAILED),
     mNfccPowerMode(0),
+    mIsIntfRstEnabled (false),
 #endif
     mDestinationGate (4), //loopback gate
     mNfaHciHandle (NFA_HANDLE_INVALID),
@@ -268,7 +269,6 @@ SecureElement::SecureElement ()
     mActivatedInListenMode (false),
     mOberthurWarmResetCommand (3),
     mGetAtrRspwait (false),
-    mWmMaxWtxCount(0),
     mRfFieldIsOn(false),
     mTransceiveWaitOk(false)
 {

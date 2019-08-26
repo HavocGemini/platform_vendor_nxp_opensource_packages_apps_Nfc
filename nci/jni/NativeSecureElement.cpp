@@ -153,7 +153,7 @@ static jint nativeNfcSecureElement_doOpenSecureElementConnection (JNIEnv*, jobje
             }
             goto TheEnd;
             if(nfcFL.eseFL._ESE_WIRED_MODE_PRIO) {
-                if(se.mIsWiredModeOpen&&(se.mActiveEeHandle == (se.EE_HANDLE_0xF4 || SecureElement::EE_HANDLE_0xF8)))
+                if(se.mIsWiredModeOpen&&(se.mActiveEeHandle == (se.EE_HANDLE_0xF4 | SecureElement::EE_HANDLE_0xF8)))
                 {
                     stat = SecureElement::getInstance().disconnectEE (se.mActiveEeHandle);
                     se.mActiveEeHandle = NFA_HANDLE_INVALID;

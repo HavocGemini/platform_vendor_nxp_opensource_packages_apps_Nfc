@@ -136,7 +136,7 @@ int nfcManager_doAppletLoadApplet(JNIEnv* e, jobject o, jstring name, jbyteArray
     (void)e;
     (void)o;
     (void)name;
-    tNFA_STATUS wStatus, status;
+    tNFA_STATUS wStatus = 0, status;
 #if (NXP_LDR_SVC_VER_2 == FALSE)
     if(nfcFL.nfcNxpEse) {
         ALOGV("%s: enter", __func__);
@@ -221,7 +221,7 @@ jbyteArray nfcManager_lsExecuteScript(JNIEnv* e, jobject o, jstring name, jstrin
     if(nfcFL.nfcNxpEse) {
 
         ALOGV("%s: enter", __func__);
-        tNFA_STATUS wStatus, status;
+        tNFA_STATUS wStatus = 0, status;
         IChannel_t Dwp;
         bool stat = false;
         const char *choice = NULL;

@@ -12,7 +12,7 @@ ifneq ($(NCI_VERSION),)
 LOCAL_CFLAGS += -DNCI_VERSION=$(NCI_VERSION) -O0 -g
 endif
 
-LOCAL_CFLAGS += -Wall -Wextra -Wno-unused-parameter
+LOCAL_CFLAGS += -Wall -Wextra -Wno-unused-parameter -Wno-unused-function
 
 #NXP PN547 Enable
 LOCAL_CFLAGS += -DNXP_EXTNS=TRUE
